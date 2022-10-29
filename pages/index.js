@@ -11,23 +11,25 @@ const AblyChatComponent = dynamic(() => import('../components/AblyChatComponent'
 export default function Home() {
 
   const [msg, setMessage] = useState("")
-  const [res, setRes] = useState("")
+  const [res, setRes] = useState([])
 
   function handleSubmit(){
-    socket.emit('input-change', msg)
+    console.log("test")
+    socket.emit('notice', msg)
   }
 
   const socketInitializer = async () => {
-    await fetch('/api/socket');
+    // await fetch('http://localhost:8000/socket.io');
 
-    socket = io()
+    socket = io("http://localhost:8000")
 
-    socket.on('connect', () => {
+    socket.on('/', () => {
       console.log('connected')
     })
 
-    socket.on('update-input', msg => {
-      setRes(msg)
+    socket.on('reply', msg => {
+      console.log("hasil")
+      setRes(res => ([...res, msg]))
     })
   }
     
@@ -37,11 +39,18 @@ export default function Home() {
 
   return (
     <>
-      <AblyChatComponent/>
+      {/* <AblyChatComponent/> */}
       <input className='border-black border' type="text" name="pesan" onChange={(e)=>{setMessage(e.target.value)}}/>
       <button onClick={handleSubmit}>kirim</button>
 
-      <p className='text-xl'>{res}</p>
+      {
+
+        res.map((el,index)=>{
+          return (
+            <p key={index} className='text-xl'>{el}</p>
+          )
+        })
+      }
     </>
   )
 }
